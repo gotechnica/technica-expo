@@ -5,10 +5,10 @@
   "homepage": "https://bitcamp.github.io",
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
-    "@fortawesome/fontawesome-free-regular": "^5.0.13",
-    "@fortawesome/fontawesome-free-solid": "^5.0.13",
-    "@fortawesome/fontawesome-svg-core": "^1.2.20",
-    "@fortawesome/react-fontawesome": "0.1.0-11",
+    "@fortawesome/free-regular-svg-icons": "^5.12.1",
+    "@fortawesome/free-solid-svg-icons": "^5.12.1",
+    "@fortawesome/fontawesome-svg-core": "^1.2.27",
+    "@fortawesome/react-fontawesome": "0.1.8",
     "axios": "^0.18.1",
     "bootstrap": "^4.3.1",
     "font-awesome": "^4.7.0",
@@ -22,7 +22,7 @@
     "react-fontawesome": "^1.6.1",
     "react-meta-tags": "^0.4.2",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "^1.1.5",
+    "react-scripts": "^3.4.0",
     "react-sticky": "^6.0.3"
   },
   "scripts": {
@@ -32,5 +32,17 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

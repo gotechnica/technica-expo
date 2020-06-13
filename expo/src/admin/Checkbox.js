@@ -1,48 +1,35 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 
-export default class Checkbox extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      color: this.props.check
-    };
-    this.handleClick = this.handleClick.bind(this);
-  }
+/**
+ *
+ * @param {Object} props
+ * @param {*} props.id
+ * @param {*} props.project_id
+ * @param {*} props.value
+ * @param {*} props.handleChange
+ */
+export default function Checkbox(props) {
+  const [checked, setChecked] = useState(props.check);
 
-  handleClick(e, id) {
-    if (this.state.color !== false) {
-      this.setState({
-        color: !this.state.color
-      });
-    }
-    this.props.handleChange(this.state.color, id, e);
-  }
-
-  render() {
-    let id = `defaultChecked${this.props.id}${this.props.project_id}`;
-    let label = `defaultChecked${this.props.id}${this.props.project_id}label`;
-    return (
-      <div
-        class="custom-control custom-checkbox"
-        onChange={e => {
-          this.handleClick(e, id);
-        }}
-      >
-        {this.state.color ? (
-          <input
-            type="checkbox"
-            class="custom-control-input"
-            id={id}
-            checked
-            disabled
-          />
-        ) : (
-          <input type="checkbox" class="custom-control-input" id={id} />
-        )}
-        <label class="custom-control-label" for={id} id={label}>
-          {this.props.value}
-        </label>
-      </div>
-    );
-  }
+  let id = `defaultChecked${props.id}${props.project_id}`;
+  let label = `defaultChecked${props.id}${props.project_id}label`;
+  return (
+    <div
+      className="custom-control custom-checkbox"
+      onChange={(e) => {
+        setChecked(!checked);
+        props.handleChange(checked, id, e);
+      }}
+    >
+      <input
+        type="checkbox"
+        className="custom-control-input"
+        id={id}
+        value={checked}
+      />
+      <label className="custom-control-label" htmlFor={id} id={label}>
+        {props.value}
+      </label>
+    </div>
+  );
 }

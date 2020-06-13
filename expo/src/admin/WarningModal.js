@@ -1,54 +1,26 @@
-import React, { Component } from "react";
+import React from "react";
 
 import "App.css";
+import GenericConfirmationModal from "components/GenericConfirmationModal";
 
-class WarningModal extends Component {
-  render() {
-    return (
-      <div className="modal fade" id={this.props.modalId} role="dialog">
-        <div className="modal-dialog" role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">
-                Delete All {this.props.whatToDelete}?
-              </h5>
-              <button
-                type="button"
-                className="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              <p className="modal_warning_text">
-                Are you sure you want to delete all{" "}
-                {this.props.whatToDelete.toLowerCase()}?
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="button button-secondary no"
-                data-dismiss="modal"
-              >
-                No
-              </button>
-              <button
-                type="button"
-                className="button button-primary yes"
-                data-dismiss="modal"
-                onClick={this.props.deleteAll}
-              >
-                Yes
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+/**
+ * Modal to confirm on deletion
+ * @param {Object} props
+ * @param {String} props.id HTML Id
+ * @param {String} props.collection Items to delete
+ * @param {String} props.onDelete Deletion callback
+ */
+export default function WarningModal(props) {
+  return (
+    <GenericConfirmationModal
+      id={props.modalId}
+      modalTitle={"Delete All" + props.collection + "?"}
+      bodyText={
+        "Are you sure you want to delete all " +
+        props.collection.toLowerCase() +
+        "?"
+      }
+      completeAction={props.onDelete}
+    />
+  );
 }
-
-export default WarningModal;

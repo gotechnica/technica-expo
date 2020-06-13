@@ -1,4 +1,4 @@
-import Card from "../components/Card.js";
+import Card from "components/Card.js";
 
 import React, { Component } from "react";
 import axiosRequest from "Backend.js";
@@ -10,13 +10,13 @@ import WinnerBadge from "customize/imgs/winner_ribbon.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faSquare } from "@fortawesome/fontawesome-free-regular";
+import { faSquare } from "@fortawesome/free-regular-svg-icons";
 import {
   faCaretDown,
   faCaretUp,
   faCheckSquare,
-  faUpload
-} from "@fortawesome/fontawesome-free-solid";
+  faUpload,
+} from "@fortawesome/free-solid-svg-icons";
 library.add(faUpload);
 library.add(faCaretDown);
 library.add(faCaretUp);
@@ -31,19 +31,19 @@ class WinnerModule extends Component {
       data: [],
       expoIsPublished: false,
       winnersRevealed: false,
-      missingWinners: []
+      missingWinners: [],
     };
   }
 
   componentWillMount() {
-    axiosRequest.get("api/is_published_status").then(status => {
+    axiosRequest.get("api/is_published_status").then((status) => {
       this.setState({
-        expoIsPublished: status === "True"
+        expoIsPublished: status === "True",
       });
     });
-    axiosRequest.get("api/publish_winners_status").then(status => {
+    axiosRequest.get("api/publish_winners_status").then((status) => {
       this.setState({
-        winnersRevealed: status === "True"
+        winnersRevealed: status === "True",
       });
     });
   }
@@ -52,8 +52,8 @@ class WinnerModule extends Component {
     // toggle based on state
 
     // Pull data, add to state, and show
-    axiosRequest.get("api/companies").then(sponsors => {
-      let projects = this.props.projects.filter(elt => {
+    axiosRequest.get("api/companies").then((sponsors) => {
+      let projects = this.props.projects.filter((elt) => {
         return (
           elt.challenges_won !== undefined && elt.challenges_won.length > 0
         );
@@ -61,14 +61,14 @@ class WinnerModule extends Component {
 
       //Build sponsor - challenge - winners struct
       let data = sponsors
-        .filter(elt => {
+        .filter((elt) => {
           return (
             elt.challenge_name !== undefined &&
             elt.winners !== undefined &&
             elt.winners.length > 0
           );
         })
-        .map(elt => {
+        .map((elt) => {
           // elt.winners => winner IDs
           // for each project, if proj.challenges_won contains elt.challenge_id
           // add proj.project_name to winners
@@ -82,19 +82,19 @@ class WinnerModule extends Component {
           return {
             sponsor: elt.company_name,
             challenge: elt.challenge_name,
-            winners: winners
+            winners: winners,
           };
         });
 
       // Build list of sponsor - challenges without winners
       let missingWinners = sponsors
-        .filter(elt => {
+        .filter((elt) => {
           return elt.challenge_name !== undefined && elt.winners.length === 0;
         })
-        .map(elt => {
+        .map((elt) => {
           return {
             sponsor: elt.company_name,
-            challenge: elt.challenge_name
+            challenge: elt.challenge_name,
           };
         });
 
@@ -110,7 +110,7 @@ class WinnerModule extends Component {
             return 0;
           }
           return s1.sponsor.localeCompare(s2.sponsor);
-        })
+        }),
       });
     });
   }
@@ -118,14 +118,14 @@ class WinnerModule extends Component {
   toggleWinnerPreview() {
     if (this.state.showPreview) {
       this.setState({
-        showPreview: false
+        showPreview: false,
       });
     } else {
       // Get a data dump
       // sponsor - challenge - winner project names
       this.loadWinners();
       this.setState({
-        showPreview: true
+        showPreview: true,
       });
     }
   }
@@ -133,11 +133,11 @@ class WinnerModule extends Component {
   publishExpo() {
     axiosRequest
       .post("api/is_published_status", {
-        is_published: true
+        is_published: true,
       })
       .then(() => {
         this.setState({
-          expoIsPublished: true
+          expoIsPublished: true,
         });
       });
   }
@@ -145,11 +145,11 @@ class WinnerModule extends Component {
   unpublishExpo() {
     axiosRequest
       .post("api/is_published_status", {
-        is_published: false
+        is_published: false,
       })
       .then(() => {
         this.setState({
-          expoIsPublished: false
+          expoIsPublished: false,
         });
       });
   }
@@ -157,11 +157,11 @@ class WinnerModule extends Component {
   showWinners() {
     axiosRequest
       .post("api/publish_winners_status", {
-        publish_winners: true
+        publish_winners: true,
       })
       .then(() => {
         this.setState({
-          winnersRevealed: true
+          winnersRevealed: true,
         });
       });
   }
@@ -169,11 +169,11 @@ class WinnerModule extends Component {
   hideWinners() {
     axiosRequest
       .post("api/publish_winners_status", {
-        publish_winners: false
+        publish_winners: false,
       })
       .then(() => {
         this.setState({
-          winnersRevealed: false
+          winnersRevealed: false,
         });
       });
   }
@@ -281,7 +281,7 @@ class WinnerModule extends Component {
         {this.state.showPreview
           ? this.state.data.length === 0
             ? "No winners have been selected"
-            : this.state.missingWinnerData.map(elt => {
+            : this.state.missingWinnerData.map((elt) => {
                 return (
                   <div>
                     {`[${elt.sponsor}] ${elt.challenge}`}
@@ -317,7 +317,7 @@ class WinnerModule extends Component {
         {this.state.showPreview
           ? this.state.data.length === 0
             ? "No winners have been selected"
-            : this.state.data.map(elt => {
+            : this.state.data.map((elt) => {
                 return (
                   <div>
                     {`[${elt.sponsor}] ${elt.challenge} - ${elt.winners.join(

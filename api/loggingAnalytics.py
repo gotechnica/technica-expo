@@ -15,7 +15,8 @@ file_handler = logging.FileHandler('analytics.log', mode='w', encoding='UTF-8')
 file_handler.setLevel(logging.DEBUG)
 
 # creating formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # add formatter
 file_handler.setFormatter(formatter)
@@ -23,7 +24,10 @@ file_handler.setFormatter(formatter)
 # add handler
 logger.addHandler(file_handler)
 
-## Public endpoint logging
+###
+# Public endpoint logging
+###
+
 
 def logged_message(message: str) -> None:
     logger.info(message)

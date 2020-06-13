@@ -1,5 +1,7 @@
 # Hackathon Expo App
 
+![Python Testing](https://github.com/bitcamp/hackathon-expo-app/workflows/Python%20Testing/badge.svg)
+
 ![Technica Expo Site](img/MainExpoPage.png)
 
 A beautiful and intuitive web app to display hackathon projects for expo

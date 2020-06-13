@@ -1,31 +1,24 @@
-import React, { Component } from "react";
+import React from "react";
 
 import "App.css";
 
-class ConfirmationButton extends Component {
-  render() {
-    return (
-      <div className="p-a-m">
-        <p className="warning-text">
-          Are you sure you want to delete {this.props.elementToDelete}?
-        </p>
-        <div className="float-right">
-          <button
-            className="button button-secondary m-r-s"
-            onClick={this.props.toggleConfirmation}
-          >
-            No
-          </button>
-          <button
-            className="button button-primary"
-            onClick={this.props.deleteElement}
-          >
-            Yes
-          </button>
-        </div>
+export default function ConfirmationButton(props) {
+  return (
+    <div className="p-a-m">
+      <p className="warning-text">
+        Are you sure you want to delete {props.elementToDelete}?
+      </p>
+      <div className="float-right">
+        <button
+          className="button button-secondary m-r-s"
+          onClick={props.toggleConfirmation}
+        >
+          No
+        </button>
+        <button className="button button-primary" onClick={props.deleteElement}>
+          Yes
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
 }
-
-export default ConfirmationButton;

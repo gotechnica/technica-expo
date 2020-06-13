@@ -1,8 +1,5 @@
-import csv
-import re
-import requests
-import json
 import helpers
+
 
 def delete_project() -> None:
     s = helpers.login()
@@ -21,12 +18,13 @@ def delete_all_projects() -> None:
     s = helpers.login()
 
     url = "https://expo-api.gotechnica.org/api/projects/deleteAll"
-    r = s.delete(url)
+    s.delete(url)
 
 
 def main() -> None:
-    #delete_project()
+    # delete_project()
     delete_all_projects()
+
 
 if __name__ == "__main__":
     main()

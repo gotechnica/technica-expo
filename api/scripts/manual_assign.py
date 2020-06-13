@@ -1,7 +1,5 @@
-import csv
 import re
 import requests
-import json
 import helpers
 
 
@@ -22,7 +20,7 @@ def available_tables() -> None:
     all_tables = list(map(lambda x: number_to_table(x), list(range(1, 391))))
     r = requests.get("https://expo-api.gotechnica.org/api/projects")
 
-    taken = re.findall('\"table_number\": \"(\w\d+)\"', r.text)
+    taken = re.findall('\"table_number\": \"(\w\d+)\"', r.text)  # noqa
     taken.sort()
     open_tables = list(set(all_tables) - set(taken))
     open_tables.sort()
@@ -31,7 +29,10 @@ def available_tables() -> None:
     print(open_tables)
 
 
-def add_project(table_number: int, project_url: str, project_name: str, challenges) -> None:
+def add_project(table_number: int,
+                project_url: str,
+                project_name: str,
+                challenges) -> None:
     s = helpers.login()
     url = "https://expo-api.gotechnica.org/api/projects/add"
     info = {
@@ -41,7 +42,7 @@ def add_project(table_number: int, project_url: str, project_name: str, challeng
         'challenges': challenges,
         'challenges_won': ""
     }
-    r = s.post(url, json=info)
+    s.post(url, json=info)
 
 
 def main() -> None:

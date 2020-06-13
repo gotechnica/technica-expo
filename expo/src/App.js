@@ -12,23 +12,23 @@ import Sponsor from "Sponsor.js";
 import SponsorLogin from "SponsorLogin.js";
 
 /* Routing control for app overall */
-const Routing = () => (
-  <Router basename="/">
-    {useCachedResponseData ? (
-      <div>
-        <Route exact path="/" component={Home} />
-        <Redirect to="/" />
-      </div>
-    ) : (
-      <div>
-        <Route exact path="/" component={Home} />
-        <Route path="/admin" component={Admin} />
-        <Route path="/sponsor" component={Sponsor} />
-        <Route path="/adminlogin" component={AdminLogin} />
-        <Route path="/sponsorlogin" component={SponsorLogin} />
-      </div>
-    )}
-  </Router>
-);
-
-export default Routing;
+export default function Routing() {
+  return (
+    <Router basename="/">
+      {useCachedResponseData ? (
+        <div>
+          <Route exact path="/" component={Home} />
+          <Redirect to="/" />
+        </div>
+      ) : (
+        <div>
+          <Route exact path="/" component={Home} />
+          <Route path="/admin" component={Admin} />
+          <Route path="/sponsor" component={Sponsor} />
+          <Route path="/adminlogin" component={AdminLogin} />
+          <Route path="/sponsorlogin" component={SponsorLogin} />
+        </div>
+      )}
+    </Router>
+  );
+}

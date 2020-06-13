@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 
 /**
- *
- * @props
- * time - Total expo length
- * count - Total number of projects
+ * Calculates average time per table for judges
+ * @param {Object} props
+ * @param {number} props.time Total time
+ * @param {number} props.count Number of tables
  */
-
 export default function JudgingTimes(props) {
   const [judges, setJudges] = useState(1);
   const [endTime, setEndTime] = useState(10);
@@ -30,7 +29,7 @@ export default function JudgingTimes(props) {
           name="judges"
           min="1"
           value={judges}
-          onChange={e => {
+          onChange={(e) => {
             setJudges(parseInt(e.target.value));
           }}
         />{" "}
@@ -42,7 +41,7 @@ export default function JudgingTimes(props) {
           name="selectionTime"
           min="1"
           value={endTime}
-          onChange={e => {
+          onChange={(e) => {
             setEndTime(parseInt(e.target.value));
           }}
         />{" "}

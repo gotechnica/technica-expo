@@ -1,8 +1,6 @@
 import csv
-import json
 import re
 import requests
-import time
 from typing import Dict, List
 
 """
@@ -90,7 +88,7 @@ def check_if_needs_to_stay(response: str):
         Any found regular expression matches from the arg.
 
     """
-    return re.search('([a-zA-Z]*\d+)', response)
+    return re.search('([a-zA-Z]*\d+)', response)  # noqa
 
 
 def format_challenges(challenges) -> List[Dict[any, any]]:
@@ -104,11 +102,12 @@ def format_challenges(challenges) -> List[Dict[any, any]]:
         challenges: str of company challenge titles
 
     Returns:
-        list of dicts with 'company', 'challenge_name', and if it has been 'won'
+        list of dicts with 'company', 'challenge_name',
+        and if it has been 'won'
 
     """
     challenges_list = []
-    if challenges is not "":
+    if challenges:
         challenges = challenges.split(',')
         for challenge in challenges:
             # TODO: possibly look into creating a hash from companies DB
@@ -139,6 +138,7 @@ def delete_projects():
     # print("size of moving: ", len(moving))
     # print("size of not moving: ", len(not_moving))
 
+
 def parse_csv_internal(reader, not_moving_question=None):
     """Parses a CSV exported from DevPort and seperates hackers based on if
     their hack needs to be stationary (i.e. can't move from table) or not.
@@ -149,14 +149,15 @@ def parse_csv_internal(reader, not_moving_question=None):
 
     Args:
         reader: CSV object
-        not_moving_question: str question to determine hackers' project mobility
+        not_moving_question: str question to determine hackers'
+                             project mobility
 
     Returns:
         tuple (moving, not_moving) of dicts mapping project names -> Project()
         objects.
 
     """
-    #already_stored = already_in_db()
+    # already_stored = already_in_db()
     for row in reader:
         project_name = row["Submission Title"].strip()
         project_url = row["Submission Url"].strip()
@@ -177,11 +178,12 @@ def parse_csv_internal(reader, not_moving_question=None):
 
         if needs_to_stay is not None:
             not_moving[project_name] = Project(project_url, challenges)
-            assignments[table_to_number(needs_to_stay.group(0))] = project_name + " | "
+            assignments[table_to_number(needs_to_stay.group(0))] = \
+                project_name + " | "
             not_moving[project_name].table_number = needs_to_stay.group(0)
         else:
             moving[project_name] = Project(project_url, challenges)
-    
+
     return moving, not_moving
 
 
@@ -224,7 +226,7 @@ def bulk_add_projects_local(projects) -> None:
     packet = {
         'projects': project_data
     }
-    r = requests.post(url, json=packet)
+    requests.post(url, json=packet)
 
 
 def main() -> None:

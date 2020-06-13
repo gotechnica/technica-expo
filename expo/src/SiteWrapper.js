@@ -5,7 +5,7 @@ import "SiteWrapper.css";
 
 /* Header / constant app features */
 
-let SiteWrapper = content => (
+let SiteWrapper = (content) => (
   <div className="App">
     <nav className="navbar navbar-expand-md">
       <Link to="/">

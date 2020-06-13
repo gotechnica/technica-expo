@@ -1,36 +1,35 @@
-import React, { Component } from "react";
+import React from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "components/Card.css";
 
 /**
- * @props
- * title - Title that goes in card header
+ * Wrapper for Bootstrap Card
+ * @param {Object} props
+ * @param {String} props.title Card title
+ * @param {String=} props.action Callback on card action
+ * @param {String=} props.actionName Name of the action in the card header
  */
-class Card extends Component {
-  render() {
-    return (
-      <div class="card">
-        <div className="card-header">
-          <div className="d-flex">
-            <div>
-              <h4>{this.props.title}</h4>
-            </div>
-            <div className="ml-auto">
-              <button
-                type="button"
-                className="link-button"
-                onClick={this.props.action}
-              >
-                {this.props.actionName}
-              </button>
-            </div>
+export default function Card(props) {
+  return (
+    <div className="card">
+      <div className="card-header">
+        <div className="d-flex">
+          <div>
+            <h4>{props.title}</h4>
+          </div>
+          <div className="ml-auto">
+            <button
+              type="button"
+              className="link-button"
+              onClick={props.action}
+            >
+              {props.actionName}
+            </button>
           </div>
         </div>
-        <div class="card-body">{this.props.children}</div>
       </div>
-    );
-  }
+      <div className="card-body">{props.children}</div>
+    </div>
+  );
 }
-
-export default Card;

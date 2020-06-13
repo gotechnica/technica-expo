@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import axiosRequest from "Backend.js";
 
 import Error from "Error.js";
@@ -15,61 +15,37 @@ const errorText =
   "code or are having trouble logging in.";
 const InvalidErr = <Error text={errorText} />;
 
-/* Sponsor login page content (see PRD) */
-class SponsorLogin extends Component {
-  constructor() {
-    super();
-    this.state = {
-      loggedIn: false,
-      error: ""
-    };
-    this.onLogin = this.onLogin.bind(this);
-  }
+export default function SponsorLogin(props) {
+  const [error, setError] = useState("");
 
-  onLogin(accessCode) {
-    let codeExists = accessCode !== undefined && accessCode !== "";
+  const onLogin = accessCode => {
+    const codeExists = accessCode !== undefined && accessCode !== "";
 
     if (codeExists) {
       axiosRequest
         .post("api/login/sponsor", { access_code: accessCode })
         .then(data => {
           if (data.includes("Logged in")) {
-            this.setState({
-              loggedIn: true,
-              error: ""
-            });
-            this.props.history.push({
+            setError("");
+
+            props.history.push({
               pathname: "/sponsor"
             });
           } else {
-            this.setState({
-              loggedIn: false,
-              error: InvalidErr
-            });
+            setError(InvalidErr);
           }
         })
         .catch(error => {
           console.log(error);
         });
     } else {
-      this.setState({
-        loggedIn: false,
-        error: InvalidErr
-      });
+      setError(InvalidErr);
     }
-  }
+  };
 
-  render() {
-    return SiteWrapper(
-      <div className="SponsorLogin">
-        <Login
-          title="Sponsor Login"
-          onLogin={this.onLogin}
-          error={this.state.error}
-        />
-      </div>
-    );
-  }
+  return SiteWrapper(
+    <div className="SponsorLogin">
+      <Login title="Sponsor Login" onLogin={onLogin} error={error} />
+    </div>
+  );
 }
-
-export default SponsorLogin;

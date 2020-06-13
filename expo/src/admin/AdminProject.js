@@ -4,21 +4,22 @@ import axiosRequest from "Backend.js";
 import CreateProjectModal from "admin/CreateProjectModal";
 import EditProjectModal from "admin/EditProjectModal";
 import WarningModal from "admin/WarningModal";
+import Card from "components/Card";
 
 import "Admin.css";
 import "App.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import SmallerParentheses from "SmallerParentheses.js";
+import SmallerParentheses from "components/SmallerParentheses.js";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faSquare } from "@fortawesome/fontawesome-free-regular";
+import { faSquare } from "@fortawesome/free-regular-svg-icons";
 import {
   faCaretDown,
   faCaretUp,
   faCheckSquare,
-  faUpload
-} from "@fortawesome/fontawesome-free-solid";
+  faUpload,
+} from "@fortawesome/free-solid-svg-icons";
 library.add(faUpload);
 library.add(faCaretDown);
 library.add(faCaretUp);
@@ -41,14 +42,14 @@ class ProjectModule extends Component {
       tableEndLetter: "",
       tableEndNumber: 0,
       skipEveryOtherTable: true,
-      viewable: true
+      viewable: true,
     };
   }
 
   createChallengesToCompanyMap(challenges_obj) {
     const allChallengesMapping = {};
     for (let company in challenges_obj) {
-      challenges_obj[company].forEach(challenge => {
+      challenges_obj[company].forEach((challenge) => {
         allChallengesMapping[challenge] = company;
       });
     }
@@ -58,7 +59,7 @@ class ProjectModule extends Component {
   createAllChallenges(obj) {
     let allChallenges = [];
     for (let key in obj) {
-      obj[key].forEach(item => {
+      obj[key].forEach((item) => {
         if (allChallenges.indexOf(item) === -1) {
           allChallenges.push(item);
         }
@@ -72,9 +73,9 @@ class ProjectModule extends Component {
     let data = this.props.projects;
     let finalProjectsData = [];
 
-    data.forEach(obj => {
+    data.forEach((obj) => {
       let challenge = [];
-      obj.challenges.forEach(item => {
+      obj.challenges.forEach((item) => {
         challenge.push(item.challenge_name);
       });
       finalProjectsData.push({
@@ -83,7 +84,7 @@ class ProjectModule extends Component {
         table_number: obj.table_number,
         url: obj.project_url,
         challenges: challenge,
-        company_challenge: obj.challenges
+        company_challenge: obj.challenges,
       });
     });
     return finalProjectsData;
@@ -93,28 +94,27 @@ class ProjectModule extends Component {
     e.preventDefault();
 
     const data = new FormData();
-    data.append("projects_csv", this.projects_csv.files[0]);
+    data.append("projects_csv", this.state.projects_csv.files[0]);
 
     if (this.projects_csv.files[0] === null) {
       this.setState({
-        uploadStatus: "Please select a file before hitting upload!"
+        uploadStatus: "Please select a file before hitting upload!",
       });
     } else {
       axiosRequest
         .post("parse_csv", data)
-        .then(response => {
-          this.projects_csv.value = ""; // Clear input field
+        .then((response) => {
           this.setState({
             // Flash success message and clear input display
             uploadStatus: response.data,
-            projectsCSV: ""
+            projectsCSV: "",
           });
           this.props.loadProjects();
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({
             // Flash error message
-            uploadStatus: "Oops! Something went wrong..."
+            uploadStatus: "Oops! Something went wrong...",
           });
         });
     }
@@ -126,7 +126,7 @@ class ProjectModule extends Component {
     const name = target.name;
 
     this.setState({
-      [name]: value
+      [name]: value,
     });
   }
 
@@ -135,13 +135,13 @@ class ProjectModule extends Component {
     if (this.state.tableAssignmentSchema === "") {
       this.setState({
         tableAssignmentStatus:
-          "Please first select a schema for assigning table numbers."
+          "Please first select a schema for assigning table numbers.",
       });
       return;
     }
     this.setState({
       tableAssignmentStatus:
-        "Processing your request to assign table numbers..."
+        "Processing your request to assign table numbers...",
     });
     axiosRequest
       .post("api/projects/assign_tables", {
@@ -150,9 +150,9 @@ class ProjectModule extends Component {
         table_start_number: parseInt(this.state.tableStartNumber, 10),
         table_end_letter: this.state.tableEndLetter,
         table_end_number: parseInt(this.state.tableEndNumber, 10),
-        skip_every_other_table: this.state.skipEveryOtherTable
+        skip_every_other_table: this.state.skipEveryOtherTable,
       })
-      .then(data => {
+      .then((data) => {
         this.setState({
           // Flash success message
           tableAssignmentStatus: data,
@@ -161,14 +161,14 @@ class ProjectModule extends Component {
           tableStartNumber: 0,
           tableEndLetter: "",
           tableEndNumber: 0,
-          skipEveryOtherTable: true
+          skipEveryOtherTable: true,
         });
         this.props.loadProjects();
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({
           // Flash error message
-          tableAssignmentStatus: "Oops! Something went wrong..."
+          tableAssignmentStatus: "Oops! Something went wrong...",
         });
       });
   }
@@ -182,21 +182,21 @@ class ProjectModule extends Component {
     ) {
       this.setState({
         tableAssignmentStatus:
-          "Processing your request to remove table assignments..."
+          "Processing your request to remove table assignments...",
       });
       axiosRequest
         .post("api/projects/clear_table_assignments")
-        .then(data => {
+        .then((data) => {
           this.setState({
             // Flash success message
-            tableAssignmentStatus: data
+            tableAssignmentStatus: data,
           });
           this.props.loadProjects();
         })
-        .catch(error => {
+        .catch((error) => {
           this.setState({
             // Flash error message
-            tableAssignmentStatus: "Oops! Something went wrong..."
+            tableAssignmentStatus: "Oops! Something went wrong...",
           });
         });
     }
@@ -216,38 +216,15 @@ class ProjectModule extends Component {
     }
   }
 
-  renderEditProjectModal = (
-    elt,
-    index,
-    allChallenges,
-    challengesToCompanyMap
-  ) => {
-    return (
-      <EditProjectModal
-        index={index}
-        editID={"modalEditProject" + index.toString()}
-        projectID={elt.project_id}
-        project_name={elt.project_name}
-        project_table={elt.table_number}
-        url={elt.url}
-        challenges={elt.challenges}
-        toggle={elt.checkVal}
-        allChallenges={allChallenges}
-        company_map={challengesToCompanyMap}
-        onEdit={this.props.loadProjects}
-      />
-    );
-  };
-
   toggleView() {
     if (this.state.viewable) {
       this.setState({
-        viewable: false
+        viewable: false,
       });
       document.getElementById("project-content").style.display = "none";
     } else {
       this.setState({
-        viewable: true
+        viewable: true,
       });
       document.getElementById("project-content").style.display = "block";
     }
@@ -260,7 +237,7 @@ class ProjectModule extends Component {
       this.props.challenges
     );
     if (this.state.textSearch !== "" && this.state.textSearch !== undefined) {
-      filteredProjects = filteredProjects.filter(elt => {
+      filteredProjects = filteredProjects.filter((elt) => {
         const upperCaseTextSearch = this.state.textSearch.toUpperCase();
         return (
           elt.project_name.toUpperCase().includes(upperCaseTextSearch) ||
@@ -268,26 +245,38 @@ class ProjectModule extends Component {
         );
       });
     }
+    let editProjectModal;
+
+    if (this.state.projectIndexToEdit >= 0) {
+      const index = this.state.projectIndexToEdit;
+      const elt = filteredProjects[index];
+
+      editProjectModal = (
+        <EditProjectModal
+          index={index}
+          key={"editProjectModal" + index}
+          id={"modalEditProject" + index.toString()}
+          projectID={elt.project_id}
+          project_name={elt.project_name}
+          project_table={elt.table_number}
+          url={elt.url}
+          challenges={elt.challenges}
+          toggle={elt.checkVal}
+          allChallenges={allChallenges}
+          company_map={challengesToCompanyMap}
+          onEdit={this.props.loadProjects}
+        />
+      );
+    }
 
     return (
-      <div className="card">
-        <div className="card-header">
-          <div className="d-flex">
-            <h4>Projects</h4>
-            <span className="ml-auto">
-              <button
-                className="link-button"
-                type="button"
-                onClick={() => {
-                  this.toggleView();
-                }}
-              >
-                {!this.state.viewable ? "Show" : "Hide"}
-              </button>
-            </span>
-          </div>
-        </div>
-
+      <Card
+        title="Projects"
+        action={() => {
+          this.toggleView();
+        }}
+        actionName={!this.state.viewable ? "Show" : "Hide"}
+      >
         <div className="card-body" id="project-content">
           <h5>Seed Database</h5>
           <form
@@ -311,7 +300,7 @@ class ProjectModule extends Component {
                   id="file"
                   name="projectsCSV"
                   onChange={this.handleInputChange.bind(this)}
-                  ref={ref => {
+                  ref={(ref) => {
                     this.projects_csv = ref;
                   }}
                 />
@@ -444,12 +433,12 @@ class ProjectModule extends Component {
 
           <h5>
             Projects{" "}
-            <SmallerParentheses font_size="15px">
+            <SmallerParentheses fontSize="15px">
               {filteredProjects.length}
             </SmallerParentheses>
           </h5>
           <CreateProjectModal
-            createID="modalCreateProject"
+            id="modalCreateProject"
             onCreate={this.props.loadProjects}
             allChallenges={allChallenges}
             company_map={challengesToCompanyMap}
@@ -472,8 +461,8 @@ class ProjectModule extends Component {
           </button>
           <WarningModal
             modalId="projectWipeWarningModal"
-            whatToDelete="Projects"
-            deleteAll={this.deleteAllProjects.bind(this)}
+            collection="Projects"
+            onDelete={this.deleteAllProjects.bind(this)}
           />
           <div className="form-group">
             <input
@@ -481,7 +470,7 @@ class ProjectModule extends Component {
               id="txtProjectSearch"
               className="form-control"
               placeholder="Search for a project name..."
-              onChange={event =>
+              onChange={(event) =>
                 this.setState({ textSearch: event.target.value })
               }
             />
@@ -507,28 +496,21 @@ class ProjectModule extends Component {
                     type="button"
                     data-toggle="modal"
                     data-target={"#modalEditProject" + index.toString()}
-                    // Hacky solution to only mount the modal when necessary
-                    // (helps if huge amount of projects in DB)
                     onMouseOver={() => {
-                      this.setState({ projectIndexToEdit: index });
+                      this.setState({
+                        projectIndexToEdit: index,
+                      });
                     }}
                   >
                     Edit
                   </button>
                 </div>
-                {this.state.projectIndexToEdit === index
-                  ? this.renderEditProjectModal(
-                      elt,
-                      index,
-                      allChallenges,
-                      challengesToCompanyMap
-                    )
-                  : null}
               </div>
             );
           })}
         </div>
-      </div>
+        {editProjectModal}
+      </Card>
     );
   }
 }

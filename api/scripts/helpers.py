@@ -1,6 +1,5 @@
-import re
 from requests import session, sessions
-import json
+
 
 def login() -> sessions.Session:
     password = input("Password: ")
@@ -15,6 +14,7 @@ def login() -> sessions.Session:
     print(r.content)
 
     return s
+
 
 # helper method for printing stuff
 def pretty_print_POST(req) -> None:

@@ -3,15 +3,21 @@ import axiosRequest from "Backend.js";
 
 import { VotingTable, WelcomeHeader } from "Sponsor.js";
 import Table from "Table.js";
-import SmallerParentheses from "SmallerParentheses.js";
+import SmallerParentheses from "components/SmallerParentheses.js";
 
 import "components/Card.css";
 import "SliderOption.css";
-import { sortByTableNumber } from "helpers.js";
+import { useWindowWidth, sortByTableNumber } from "./helpers";
 
-import JudgingTimes from "./JudgingTime";
+// This is a wrapper for the old SearchandFilter component. It's a beast that should be broken up and done with hooks.
+// Doing that all at once is hard, hence this wrapper.
+export default function SearchandFilter(props) {
+  const width = useWindowWidth();
 
-class SearchandFilter extends Component {
+  return <SearchandFilterInner {...props} width={width} />;
+}
+
+class SearchandFilterInner extends Component {
   constructor(props) {
     super(props);
 
@@ -23,21 +29,15 @@ class SearchandFilter extends Component {
       toggle_off: true,
       challenges: {},
       workingdata: [],
-      width: window.innerWidth,
       winnersRevealed: false,
       expoIsPublished: false,
       expoLength: 0,
-      totalCount: 0
+      totalCount: 0,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
     this.setSponsorWorkingData = this.setSponsorWorkingData.bind(this);
     this.makeVotingData = this.makeVotingData.bind(this);
-    this.updateDimensions = this.updateDimensions.bind(this);
-  }
-
-  updateDimensions() {
-    this.setState({ width: window.innerWidth });
   }
 
   componentDidMount() {
@@ -47,8 +47,8 @@ class SearchandFilter extends Component {
       getAllProjectsUrl = "api/projects_and_winners";
     }
 
-    axiosRequest.get(getAllProjectsUrl).then(project_data => {
-      axiosRequest.get("api/challenges").then(challenge_data => {
+    axiosRequest.get(getAllProjectsUrl).then((project_data) => {
+      axiosRequest.get("api/challenges").then((challenge_data) => {
         // Check first project element and see if table numbers consist of both alpha and numeric portions
         const tableNumbersAreOnlyNumeric =
           project_data["projects"].length > 0 &&
@@ -64,38 +64,31 @@ class SearchandFilter extends Component {
               project_data["projects"],
               challenge_data
             ),
-            isLoadingData: false
+            isLoadingData: false,
           },
           () => {
             this.setState({
-              totalCount: this.state.workingdata.length
+              totalCount: this.state.workingdata.length,
             });
           }
         );
       });
       this.setState({
         winnersRevealed: project_data["publish_winners"],
-        expoIsPublished: project_data["is_published"]
+        expoIsPublished: project_data["is_published"],
       });
     });
 
-    axiosRequest.get("api/expo_length").then(length => {
+    axiosRequest.get("api/expo_length").then((length) => {
       this.setState({
-        expoLength: parseInt(length)
+        expoLength: parseInt(length),
       });
     });
-
-    this.updateDimensions();
-    window.addEventListener("resize", this.updateDimensions);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.updateDimensions);
   }
 
   applyFilters() {
     let updatedList = this.state.data;
-    updatedList = updatedList.filter(item => {
+    updatedList = updatedList.filter((item) => {
       // Check text filter
       let matchesTextFilter =
         this.state.textSearch === undefined ||
@@ -120,7 +113,7 @@ class SearchandFilter extends Component {
       return matchesTextFilter && matchesChallengeFilter;
     });
     this.setState({
-      workingdata: updatedList
+      workingdata: updatedList,
     });
   }
 
@@ -129,7 +122,7 @@ class SearchandFilter extends Component {
       let searchVal = e.target.value;
       this.setState(
         {
-          textSearch: searchVal
+          textSearch: searchVal,
         },
         () => this.applyFilters()
       );
@@ -137,7 +130,7 @@ class SearchandFilter extends Component {
       let val = e.target.value.split(" - ")[0];
       this.setState(
         {
-          value: val
+          value: val,
         },
         () => this.applyFilters()
       );
@@ -146,14 +139,14 @@ class SearchandFilter extends Component {
 
   createChallengeArray() {
     let challenges = [];
-    Object.keys(this.state.challenges).forEach(company => {
-      this.state.challenges[company].forEach(challenge => {
+    Object.keys(this.state.challenges).forEach((company) => {
+      this.state.challenges[company].forEach((challenge) => {
         if (challenges.indexOf(challenge) === -1) {
           challenges.push(challenge + " - " + company);
         }
       });
     });
-    challenges = challenges.sort(function(a, b) {
+    challenges = challenges.sort(function (a, b) {
       if (a < b) return -1;
       else if (a > b) return 1;
       return 0;
@@ -166,7 +159,7 @@ class SearchandFilter extends Component {
     if (this.props.loggedIn !== undefined) {
       if (challenge_data[this.props.loggedIn] !== undefined) {
         challenges = challenge_data[this.props.loggedIn];
-        challenges = challenges.sort(function(a, b) {
+        challenges = challenges.sort(function (a, b) {
           if (a < b) return -1;
           else if (a > b) return 1;
           return 0;
@@ -181,8 +174,8 @@ class SearchandFilter extends Component {
       let firstChallenge = this.createChallengeSponsorArray(challenges)[0];
       let initialData = [];
 
-      projects.forEach(obj => {
-        obj.challenges.forEach(item => {
+      projects.forEach((obj) => {
+        obj.challenges.forEach((item) => {
           if (
             item.company === this.props.loggedIn &&
             item.challenge_name === firstChallenge
@@ -201,9 +194,9 @@ class SearchandFilter extends Component {
   makeVotingData(challenges) {
     if (this.props.origin === "sponsor") {
       let voting_data = {};
-      this.state.data.forEach(obj => {
+      this.state.data.forEach((obj) => {
         let temp = {};
-        obj.challenges.forEach(item => {
+        obj.challenges.forEach((item) => {
           if (item.company === this.props.loggedIn) {
             if (challenges.indexOf(item.challenge_name) !== -1) {
               temp[item.challenge_name] = false;
@@ -213,7 +206,7 @@ class SearchandFilter extends Component {
         if (Object.keys(temp).length !== 0) {
           voting_data[obj.project_id] = {
             checked: temp,
-            project_name: obj.project_name
+            project_name: obj.project_name,
           };
         }
       });
@@ -223,7 +216,7 @@ class SearchandFilter extends Component {
 
   handleToggle() {
     this.setState({
-      toggle_off: !this.state.toggle_off
+      toggle_off: !this.state.toggle_off,
     });
   }
 
@@ -262,7 +255,7 @@ class SearchandFilter extends Component {
     let project_hash = {};
     if (this.props.origin === "sponsor") {
       voting_data = this.makeVotingData(sponsor_challenges);
-      Object.keys(voting_data).forEach(project_id => {
+      Object.keys(voting_data).forEach((project_id) => {
         project_hash[project_id] = voting_data[project_id].project_name;
       });
     }
@@ -303,16 +296,15 @@ class SearchandFilter extends Component {
           project_hash={project_hash}
           logout={this.props.logout}
         />
-      ) : (
-        <Fragment></Fragment>
-      );
+      ) : null;
 
+    // This should optimally be in there, but the component had some bugs. Uncomment when it's usable again
     /*let judging_times = (this.props.origin === "sponsor" ?
-      <div class="row">
-        <div class="col">
+      <div className="row">
+        <div className="col">
           <JudgingTimes count={this.state.totalCount} time={this.state.expoLength} />
         </div>
-      </div> : <Fragment></Fragment>);*/
+      </div> : null);*/
     let judging_times = null;
 
     let toggle_style =
@@ -323,38 +315,38 @@ class SearchandFilter extends Component {
             marginTop: "10px",
             border: "0px solid",
             height: "30px",
-            outline: "none"
+            outline: "none",
           }
         : {
-            display: "none"
+            display: "none",
           };
-    let style = this.state.width < 460 ? "center" : "left";
+    let style = this.props.width < 460 ? "center" : "left";
 
     return (
       <div>
         {welcome_header}
         {judging_times}
-        <div class="card">
+        <div className="card">
           {this.props.origin === "sponsor" ? (
-            <div class="card-header">
+            <div className="card-header">
               <h5>
                 Select Your Challenge Winner
-                <SmallerParentheses font_size="15px">s</SmallerParentheses>
+                <SmallerParentheses fontSize="15px">s</SmallerParentheses>
               </h5>
             </div>
           ) : (
             <div style={{ marginTop: "15px" }}></div>
           )}
-          <div class="card-body">
+          <div className="card-body">
             <form>
               <div className="form-group">
                 <input
                   type="text"
                   placeholder="Filter projects by name"
                   className="form-control"
-                  onChange={event => {
+                  onChange={(event) => {
                     this.setState({
-                      textSearch: event.target.value
+                      textSearch: event.target.value,
                     });
                     this.handleChange(event);
                   }}
@@ -368,12 +360,10 @@ class SearchandFilter extends Component {
                 </div>
               </div>
               {/* Show Attempted Challenge Toggle */}
-              {this.props.origin === "sponsor" ? (
-                <Fragment></Fragment>
-              ) : (
+              {this.props.origin === "sponsor" ? null : (
                 <Fragment>
                   <div style={{ textAlign: style }}>
-                    <div class="btn-group">
+                    <div className="btn-group">
                       <button
                         className="toggle-btn"
                         style={toggle_style}
@@ -390,7 +380,7 @@ class SearchandFilter extends Component {
                           </label>
                         </div>
                       </button>
-                      {this.state.width >= 427 ? (
+                      {this.props.width >= 427 ? (
                         <button
                           disabled
                           className="toggle-label"
@@ -400,18 +390,16 @@ class SearchandFilter extends Component {
                             outline: "none",
                             color: "white",
                             marginTop: "10px",
-                            marginLeft: "-7px"
+                            marginLeft: "-7px",
                           }}
                         >
                           Show Attempted Challenges
                         </button>
-                      ) : (
-                        <Fragment></Fragment>
-                      )}
+                      ) : null}
                     </div>
                   </div>
 
-                  {this.state.width < 427 ? (
+                  {this.props.width < 427 ? (
                     <div style={{ textAlign: "center" }}>
                       <button
                         className="toggle-label"
@@ -420,36 +408,30 @@ class SearchandFilter extends Component {
                           border: "0px solid",
                           outline: "none",
                           color: "white",
-                          marginTop: "0px"
+                          marginTop: "0px",
                         }}
                         disabled
                       >
                         Show Attempted Challenges
                       </button>
                     </div>
-                  ) : (
-                    <Fragment></Fragment>
-                  )}
+                  ) : null}
                 </Fragment>
               )}
             </form>
-            {this.props.origin === "sponsor" ? table : <Fragment></Fragment>}
+            {this.props.origin === "sponsor" ? table : null}
           </div>
         </div>
         {this.props.origin === "home" ? (
-          <div class="row">
-            <div class="col">
-              <div class="card">
-                <div class="card-body">{table}</div>
+          <div className="row">
+            <div className="col">
+              <div className="card">
+                <div className="card-body">{table}</div>
               </div>
             </div>
           </div>
-        ) : (
-          <Fragment></Fragment>
-        )}
+        ) : null}
       </div>
     );
   }
 }
-
-export default SearchandFilter;

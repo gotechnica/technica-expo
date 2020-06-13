@@ -1,9 +1,6 @@
 # Gets sponsor access codes
-
-import re
-import requests
-import json
 import helpers
+
 
 def get_access_codes() -> None:
     s = helpers.login()
@@ -19,6 +16,7 @@ def get_access_codes() -> None:
 
     for c in cs:
         print(c)
+
 
 if __name__ == "__main__":
     get_access_codes()

@@ -10,7 +10,7 @@ idna==2.7
 itsdangerous==0.24
 Jinja2==2.10
 logger==1.4
-MarkupSafe==1.0
+MarkupSafe==1.1.1
 post==1.0.2
 public==1.0.3
 pymongo==3.6.1
@@ -21,4 +21,3 @@ urllib3==1.24.2
 Werkzeug==0.15.3
 mypy==0.720
 mypy-extensions==0.4.1
-pytest==5.2.0

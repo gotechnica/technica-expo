@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axiosRequest from "Backend.js";
+import Card from "components/Card.js";
 
 import CreateChallengeModal from "admin/CreateChallengeModal";
 import CreateSponsorModal from "admin/CreateSponsorModal";
@@ -12,13 +13,13 @@ import "Admin.css";
 import "App.css";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faSquare } from "@fortawesome/fontawesome-free-regular";
+import { faSquare } from "@fortawesome/free-regular-svg-icons";
 import {
   faCaretDown,
   faCaretUp,
   faCheckSquare,
-  faUpload
-} from "@fortawesome/fontawesome-free-solid";
+  faUpload,
+} from "@fortawesome/free-solid-svg-icons";
 library.add(faUpload);
 library.add(faCaretDown);
 library.add(faCaretUp);
@@ -32,30 +33,18 @@ class SponsorModule extends Component {
     this.state = {
       textSearch: "",
       sponsors: [],
-      viewable: true
+      viewable: true,
+      sponsor_names: [],
     };
   }
 
   loadCompanies() {
-    axiosRequest.get("api/companies").then(sponsors => {
+    axiosRequest.get("api/companies").then((sponsors) => {
       this.setState({
-        sponsors: sponsors
+        sponsors: sponsors, // this is the list of challenges
+        sponsor_names: [...new Set(sponsors.map((x) => x["company_name"]))],
       });
     });
-  }
-
-  toggleView() {
-    if (this.state.viewable) {
-      this.setState({
-        viewable: false
-      });
-      document.getElementById("sponsor-content").style.display = "none";
-    } else {
-      this.setState({
-        viewable: true
-      });
-      document.getElementById("sponsor-content").style.display = "block";
-    }
   }
 
   deleteAllSponsors() {
@@ -88,10 +77,10 @@ class SponsorModule extends Component {
   render() {
     // Compress list by access_code to suit view
     let compressedSponsors = [];
-    this.state.sponsors.forEach(elt => {
+    this.state.sponsors.forEach((elt) => {
       // Check whether code is unique
       let codeSeen = false;
-      compressedSponsors.forEach(sponsor => {
+      compressedSponsors.forEach((sponsor) => {
         if (sponsor.access_code === elt.access_code) {
           codeSeen = true;
         }
@@ -103,13 +92,13 @@ class SponsorModule extends Component {
           access_code: elt.access_code,
           company_name: elt.company_name,
           challenges: [],
-          id: elt.company_id
+          id: elt.company_id,
         });
       }
 
       // Add challenge to corresponding sponsor
       let current_sponsor = null;
-      compressedSponsors.forEach(sponsor => {
+      compressedSponsors.forEach((sponsor) => {
         if (sponsor.access_code === elt.access_code) {
           current_sponsor = sponsor;
         }
@@ -118,7 +107,7 @@ class SponsorModule extends Component {
         current_sponsor.challenges.push({
           challenge: elt.challenge_name,
           id: elt.challenge_id,
-          num_winners: elt.num_winners
+          num_winners: elt.num_winners,
         });
       }
     });
@@ -126,11 +115,11 @@ class SponsorModule extends Component {
     // Prepare sponsor list against filter (including sponsor name and challenges)
     let filteredSponsors = compressedSponsors;
     if (this.state.textSearch !== "" && this.state.textSearch !== undefined) {
-      filteredSponsors = filteredSponsors.filter(elt => {
+      filteredSponsors = filteredSponsors.filter((elt) => {
         let casedTextSearch = this.state.textSearch.toUpperCase();
 
         let chalSearch = false;
-        elt.challenges.forEach(chal => {
+        elt.challenges.forEach((chal) => {
           if (chal.challenge.toUpperCase().includes(casedTextSearch)) {
             chalSearch = true;
           }
@@ -146,94 +135,126 @@ class SponsorModule extends Component {
       return s1.company_name.localeCompare(s2.company_name);
     });
 
-    return (
-      <div className="card">
-        <div className="card-header">
-          <div className="d-flex">
-            <h4>Sponsors ({this.state.sponsors.length})</h4>
-            <span className="ml-auto">
-              <button
-                className="link-button"
-                type="button"
-                onClick={() => {
-                  this.toggleView();
-                }}
-              >
-                {!this.state.viewable ? "Show" : "Hide"}
-              </button>
-            </span>
-          </div>
-        </div>
-        <div className="card-body" id="sponsor-content">
-          <CreateSponsorModal
-            createID="modalCreateSponsor"
-            onCreate={this.loadCompanies.bind(this)}
-          />
-          <button
-            className="button button-primary m-b-m m-r-m"
-            type="button"
-            data-toggle="modal"
-            data-target="#modalCreateSponsor"
-          >
-            Create New Sponsor
-          </button>
-          <button
-            className="button button-warning m-b-m"
-            type="button"
-            data-toggle="modal"
-            data-target="#companyWipeWarningModal"
-          >
-            Delete ALL Sponsors
-          </button>
-          <WarningModal
-            modalId="companyWipeWarningModal"
-            whatToDelete="Sponsors"
-            deleteAll={this.deleteAllSponsors.bind(this)}
-          />
-          <button
-            className="button button-primary m-b-m"
-            type="button"
-            data-toggle="modal"
-            data-target="#seed-devpost-challenges"
-          >
-            Seed Sponsors/Challenges from Devpost
-          </button>
-          <SubmitInputModal
-            modalId="seed-devpost-challenges"
-            modalTitle="Seed Sponsors and Challenges from Devpost"
-            bodyText="Give us your hackathon's Devpost link (with the https) and we'll seed your Expo App
+    const content = !this.state.viewable ? null : (
+      <div className="card-body" id="sponsor-content">
+        <CreateSponsorModal
+          id="modalCreateSponsor"
+          onCreate={this.loadCompanies.bind(this)}
+        />
+        <button
+          className="button button-primary m-b-m m-r-m"
+          type="button"
+          data-toggle="modal"
+          data-target="#modalCreateSponsor"
+        >
+          Create New Sponsor
+        </button>
+        <button
+          className="button button-warning m-b-m"
+          type="button"
+          data-toggle="modal"
+          data-target="#companyWipeWarningModal"
+        >
+          Delete ALL Sponsors
+        </button>
+        <WarningModal
+          modalId="companyWipeWarningModal"
+          collection="Sponsors"
+          onDelete={this.deleteAllSponsors.bind(this)}
+        />
+        <button
+          className="button button-primary m-b-m"
+          type="button"
+          data-toggle="modal"
+          data-target="#seed-devpost-challenges"
+        >
+          Seed Sponsors/Challenges from Devpost
+        </button>
+        <SubmitInputModal
+          id="seed-devpost-challenges"
+          modalTitle="Seed Sponsors and Challenges from Devpost"
+          bodyText="Give us your hackathon's Devpost link (with the https) and we'll seed your Expo App
                 with all of your sponsors and challenges! Make sure you're following our Devpost naming guidelines
                 (Ex: challenge_name - company_name)."
-            inputLabel="Devpost Link"
-            inputPlaceholder="https://bitcamp2019.devpost.com"
-            isInputRequired={true}
-            completeAction={devpostUrl =>
-              this.seedChallengesFromDevpost(devpostUrl)
+          inputLabel="Devpost Link"
+          inputPlaceholder="https://bitcamp2019.devpost.com"
+          isInputRequired={true}
+          completeAction={(devpostUrl) =>
+            this.seedChallengesFromDevpost(devpostUrl)
+          }
+          submitText="Seed from Devpost"
+        />
+        <div className="form-group">
+          <input
+            type="text"
+            id="txtSponsorSearch"
+            className="form-control"
+            placeholder="Search for a sponsor or challenge name..."
+            onChange={(event) =>
+              this.setState({ textSearch: event.target.value })
             }
-            submitText="Seed from Devpost"
           />
-          <div className="form-group">
-            <input
-              type="text"
-              id="txtSponsorSearch"
-              className="form-control"
-              placeholder="Search for a sponsor or challenge name..."
-              onChange={event =>
-                this.setState({ textSearch: event.target.value })
-              }
-            />
-          </div>
-          {filteredSponsors.map((elt, key) => {
-            return (
-              <div className="sponsor-card" key={key}>
+        </div>
+        {filteredSponsors.map((elt, key) => {
+          return (
+            <div className="sponsor-card" key={key}>
+              <div>
+                <div className="d-flex">
+                  <h5>{elt.company_name}</h5>
+                  <span className="ml-auto">
+                    <EditSponsorModal
+                      id={"modalEditSponsor" + key.toString()}
+                      sponsorCode={elt.access_code}
+                      sponsorName={elt.company_name}
+                      sponsorID={elt.id}
+                      onEdit={this.loadCompanies.bind(this)}
+                    />
+                    <button
+                      className="link-button"
+                      type="button"
+                      data-toggle="modal"
+                      data-target={"#modalEditSponsor" + key.toString()}
+                    >
+                      Edit Details
+                    </button>
+                  </span>
+                </div>
+
                 <div>
-                  <div className="d-flex">
-                    <h5>{elt.company_name}</h5>
-                    <span className="ml-auto">
-                      <EditSponsorModal
-                        editID={"modalEditSponsor" + key.toString()}
-                        sponsorCode={elt.access_code}
-                        sponsorName={elt.company_name}
+                  <CreateChallengeModal
+                    id={"modalCreateChallenge" + key.toString()}
+                    key={
+                      "modalCreateChallenge" +
+                      key.toString() +
+                      elt.challenges.length
+                    }
+                    company={elt.company_name}
+                    sponsorID={elt.id}
+                    onCreate={this.loadCompanies.bind(this)}
+                  />
+                  <button
+                    className="link-button shrink-0"
+                    type="button"
+                    data-toggle="modal"
+                    data-target={"#modalCreateChallenge" + key.toString()}
+                  >
+                    Create Challenge
+                  </button>
+                </div>
+
+                {elt.challenges.map((challenge, i) => {
+                  return (
+                    <div>
+                      {(i + 1).toString() + ") " + challenge.challenge + " "}
+                      <EditChallengeModal
+                        id={
+                          "modalEditChallenge" +
+                          elt.access_code.toString() +
+                          i.toString()
+                        }
+                        challengeTitle={challenge.challenge}
+                        numWinners={challenge.num_winners}
+                        challengeID={challenge.id}
                         sponsorID={elt.id}
                         onEdit={this.loadCompanies.bind(this)}
                       />
@@ -241,68 +262,35 @@ class SponsorModule extends Component {
                         className="link-button"
                         type="button"
                         data-toggle="modal"
-                        data-target={"#modalEditSponsor" + key.toString()}
+                        data-target={
+                          "#modalEditChallenge" +
+                          elt.access_code.toString() +
+                          i.toString()
+                        }
                       >
-                        Edit Details
+                        Edit
                       </button>
-                    </span>
-                  </div>
-
-                  <div>
-                    <CreateChallengeModal
-                      createID={"modalCreateChallenge" + key.toString()}
-                      company={elt.company_name}
-                      sponsorID={elt.id}
-                      onCreate={this.loadCompanies.bind(this)}
-                    />
-                    <button
-                      className="link-button shrink-0"
-                      type="button"
-                      data-toggle="modal"
-                      data-target={"#modalCreateChallenge" + key.toString()}
-                    >
-                      Create Challenge
-                    </button>
-                  </div>
-
-                  {elt.challenges.map((challenge, i) => {
-                    return (
-                      <div>
-                        {(i + 1).toString() + ") " + challenge.challenge + " "}
-                        <EditChallengeModal
-                          editID={
-                            "modalEditChallenge" +
-                            elt.access_code.toString() +
-                            i.toString()
-                          }
-                          challengeTitle={challenge.challenge}
-                          numWinners={challenge.num_winners}
-                          challengeID={challenge.id}
-                          sponsorID={elt.id}
-                          onEdit={this.loadCompanies.bind(this)}
-                        />
-                        <button
-                          className="link-button"
-                          type="button"
-                          data-toggle="modal"
-                          data-target={
-                            "#modalEditChallenge" +
-                            elt.access_code.toString() +
-                            i.toString()
-                          }
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-                <hr />
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
+              <hr />
+            </div>
+          );
+        })}
       </div>
+    );
+
+    return (
+      <Card
+        title={"Sponsors(" + this.state.sponsor_names.length + ")"}
+        action={() => {
+          this.setState({ viewable: !this.state.viewable });
+        }}
+        actionName={!this.state.viewable ? "Show" : "Hide"}
+      >
+        {content}
+      </Card>
     );
   }
 }

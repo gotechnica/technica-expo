@@ -5,16 +5,14 @@ import SiteWrapper from "SiteWrapper.js";
 
 import "App.css";
 
-export default class Home extends React.Component {
-  render() {
-    return SiteWrapper(
-      <div class="Home">
-        <div class="row">
-          <div class="col">
-            <SearchandFilter origin="home" />
-          </div>
+export default function Home() {
+  return SiteWrapper(
+    <div className="Home">
+      <div className="row">
+        <div className="col">
+          <SearchandFilter origin="home" />
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
